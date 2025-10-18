@@ -3,6 +3,7 @@ import { createClient } from "@/utils/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, TrendingUp, Network, Award } from "lucide-react";
 import { getDirectReferrals, getTeamVolume, getBinaryTree, getActiveMembers } from "@/app/actions/team";
+import BinaryTreeVisualization from "@/components/mlm/BinaryTreeVisualization";
 import {
   Table,
   TableBody,
@@ -91,63 +92,7 @@ export default async function TeamPage() {
       </div>
 
       {/* Binary Tree Visualization */}
-      <Card className="card">
-        <CardHeader>
-          <CardTitle>Binary Tree Structure</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <div className="min-w-[600px] flex flex-col items-center space-y-8 py-8">
-              {/* Root Node (You) */}
-              <div className="flex flex-col items-center">
-                <div className="bg-primary text-primary-foreground rounded-lg p-4 shadow-lg">
-                  <p className="font-bold">You</p>
-                  <p className="text-sm opacity-80">{user.email}</p>
-                </div>
-              </div>
-
-              {/* Level 1 */}
-              {binaryTree && binaryTree.length > 0 && (
-                <>
-                  <div className="flex justify-center gap-32">
-                    {/* Left Node */}
-                    <div className="flex flex-col items-center">
-                      {binaryTree.find((n: any) => n.position === 'left' && n.depth === 1) ? (
-                        <div className="bg-blue-500/10 border-2 border-blue-500 rounded-lg p-4 shadow">
-                          <p className="font-semibold text-sm">Left Leg</p>
-                          <p className="text-xs text-muted-foreground">
-                            {binaryTree.find((n: any) => n.position === 'left' && n.depth === 1)?.email}
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="bg-muted border-2 border-dashed rounded-lg p-4 opacity-50">
-                          <p className="text-sm">Empty</p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Right Node */}
-                    <div className="flex flex-col items-center">
-                      {binaryTree.find((n: any) => n.position === 'right' && n.depth === 1) ? (
-                        <div className="bg-orange-500/10 border-2 border-orange-500 rounded-lg p-4 shadow">
-                          <p className="font-semibold text-sm">Right Leg</p>
-                          <p className="text-xs text-muted-foreground">
-                            {binaryTree.find((n: any) => n.position === 'right' && n.depth === 1)?.email}
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="bg-muted border-2 border-dashed rounded-lg p-4 opacity-50">
-                          <p className="text-sm">Empty</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <BinaryTreeVisualization data={binaryTree || []} currentUserId={user.id} />
 
       {/* Team Members Table */}
       <Card className="card">

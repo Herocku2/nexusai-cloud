@@ -58,31 +58,8 @@ export const data = {
     // ===== RANGOS =====
     {
       title: "Mi Rango",
-      url: "#",
+      url: "/dashboard/ranks",
       icon: Award,
-      isActive: true,
-      items: [
-        {
-          title: "Rango Actual",
-          url: "/rank/current",
-          circleColor: "bg-yellow-500",
-        },
-        {
-          title: "Progreso",
-          url: "/rank/progress",
-          circleColor: "bg-primary",
-        },
-        {
-          title: "Requisitos",
-          url: "/rank/requirements",
-          circleColor: "bg-green-600",
-        },
-        {
-          title: "Historial de Rangos",
-          url: "/rank/history",
-          circleColor: "bg-purple-600",
-        },
-      ],
     },
     {
       label: "Academia & Aprendizaje",
