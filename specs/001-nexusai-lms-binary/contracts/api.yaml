@@ -1,0 +1,968 @@
+openapi: 3.0.3
+info:
+  title: Nexus AI LMS Platform API
+  description: API for the Nexus AI LMS platform with binary MLM system
+  version: 1.0.0
+  contact:
+    name: Nexus AI Development Team
+    email: dev@nexusai.com
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Development server
+  - url: https://api.nexusai.com/v1
+    description: Production server
+
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Authenticate user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logout user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Logged out successfully"
+
+  /auth/2fa/enable:
+    post:
+      tags:
+        - Authentication
+      summary: Enable two-factor authentication
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 2FA setup information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  qr_code:
+                    type: string
+                    description: Base64 encoded QR code
+                  secret:
+                    type: string
+                    description: TOTP secret
+                  backup_codes:
+                    type: array
+                    items:
+                      type: string
+
+  /auth/2fa/verify:
+    post:
+      tags:
+        - Authentication
+      summary: Verify two-factor authentication code
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: 6-digit TOTP code
+      responses:
+        '200':
+          description: 2FA verified successfully
+        '422':
+          description: Invalid code
+
+  /user/profile:
+    get:
+      tags:
+        - User
+      summary: Get user profile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User profile data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+
+    put:
+      tags:
+        - User
+      summary: Update user profile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileRequest'
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+
+  /user/binary-tree:
+    get:
+      tags:
+        - Binary Tree
+      summary: Get user's binary tree
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Binary tree structure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BinaryTreeResponse'
+
+  /user/binary-positions:
+    post:
+      tags:
+        - Binary Tree
+      summary: Place new member in binary tree
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: integer
+                  description: User ID to place
+                position:
+                  type: string
+                  enum: [left, right]
+                  description: Position in binary tree
+      responses:
+        '200':
+          description: Position assigned successfully
+        '422':
+          description: Invalid position or user already placed
+
+  /transactions:
+    get:
+      tags:
+        - Transactions
+      summary: Get user transactions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [deposit, withdrawal, commission, bonus, fee]
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, processing, completed, failed, cancelled]
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: List of transactions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transaction'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+  /transactions/deposit:
+    post:
+      tags:
+        - Transactions
+      summary: Create deposit transaction
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                  format: decimal
+                  description: Deposit amount in USDT
+                type:
+                  type: string
+                  enum: [initial, monthly]
+                  description: Deposit type
+      responses:
+        '201':
+          description: Deposit created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+
+  /transactions/withdraw:
+    post:
+      tags:
+        - Transactions
+      summary: Create withdrawal request
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                  format: decimal
+                  description: Withdrawal amount in USDT
+                destination_address:
+                  type: string
+                  description: USDT destination address
+      responses:
+        '201':
+          description: Withdrawal request created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WithdrawalRequest'
+
+  /commissions:
+    get:
+      tags:
+        - Commissions
+      summary: Get user commissions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [fast_start, binary, matching]
+        - name: date_from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: List of commissions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Commission'
+                  summary:
+                    $ref: '#/components/schemas/CommissionSummary'
+
+  /academy/content:
+    get:
+      tags:
+        - Academy
+      summary: Get available content
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [video, document, quiz, zoom_meeting]
+        - name: category
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of available content
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Content'
+
+  /academy/content/{id}/progress:
+    get:
+      tags:
+        - Academy
+      summary: Get content progress
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Content progress data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentProgress'
+
+    put:
+      tags:
+        - Academy
+      summary: Update content progress
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                progress_percentage:
+                  type: integer
+                  minimum: 0
+                  maximum: 100
+                watch_time:
+                  type: integer
+                  description: Watch time in seconds
+                status:
+                  type: string
+                  enum: [not_started, in_progress, completed]
+      responses:
+        '200':
+          description: Progress updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentProgress'
+
+  /notifications:
+    get:
+      tags:
+        - Notifications
+      summary: Get user notifications
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: unread_only
+          in: query
+          schema:
+            type: boolean
+            default: false
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: List of notifications
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Notification'
+                  unread_count:
+                    type: integer
+
+    put:
+      tags:
+        - Notifications
+      summary: Mark notifications as read
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                notification_ids:
+                  type: array
+                  items:
+                    type: integer
+                  description: Array of notification IDs to mark as read
+      responses:
+        '200':
+          description: Notifications marked as read
+
+components:
+  schemas:
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - username
+        - password
+        - first_name
+        - last_name
+      properties:
+        email:
+          type: string
+          format: email
+        username:
+          type: string
+          minLength: 3
+          maxLength: 50
+        password:
+          type: string
+          minLength: 8
+        first_name:
+          type: string
+        last_name:
+          type: string
+        phone:
+          type: string
+        country_code:
+          type: string
+          length: 2
+        sponsor_id:
+          type: integer
+          description: Optional sponsor user ID
+        terms_accepted:
+          type: boolean
+          description: Must be true to register
+
+    LoginRequest:
+      type: object
+      required:
+        - login
+        - password
+      properties:
+        login:
+          type: string
+          description: Email or username
+        password:
+          type: string
+        two_factor_code:
+          type: string
+          description: 6-digit code if 2FA is enabled
+
+    AuthResponse:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        token:
+          type: string
+        expires_in:
+          type: integer
+          description: Token expiration time in seconds
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        uuid:
+          type: string
+          format: uuid
+        email:
+          type: string
+        username:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+        phone:
+          type: string
+        country_code:
+          type: string
+        status:
+          type: string
+          enum: [pending, active, inactive, suspended]
+        two_factor_enabled:
+          type: boolean
+        email_verified_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    UserProfile:
+      allOf:
+        - $ref: '#/components/schemas/User'
+        - type: object
+          properties:
+            current_rank:
+              $ref: '#/components/schemas/Rank'
+            binary_position:
+              $ref: '#/components/schemas/BinaryPosition'
+            membership:
+              $ref: '#/components/schemas/Membership'
+            balance:
+              type: number
+              format: decimal
+              description: Available balance in USDT
+
+    UpdateProfileRequest:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        phone:
+          type: string
+        country_code:
+          type: string
+          length: 2
+        date_of_birth:
+          type: string
+          format: date
+
+    BinaryPosition:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        sponsor_id:
+          type: integer
+        position_leg:
+          type: string
+          enum: [left, right]
+        left_volume:
+          type: number
+          format: decimal
+        right_volume:
+          type: number
+          format: decimal
+        left_carryover:
+          type: number
+          format: decimal
+        right_carryover:
+          type: number
+          format: decimal
+        level:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+
+    BinaryTreeResponse:
+      type: object
+      properties:
+        root:
+          $ref: '#/components/schemas/BinaryPosition'
+        left_leg:
+          $ref: '#/components/schemas/BinaryPosition'
+        right_leg:
+          $ref: '#/components/schemas/BinaryPosition'
+        total_left_volume:
+          type: number
+          format: decimal
+        total_right_volume:
+          type: number
+          format: decimal
+        weaker_leg:
+          type: string
+          enum: [left, right]
+        weaker_leg_volume:
+          type: number
+          format: decimal
+
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: integer
+        uuid:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [deposit, withdrawal, commission, bonus, fee]
+        subtype:
+          type: string
+        amount:
+          type: number
+          format: decimal
+        fee:
+          type: number
+          format: decimal
+        net_amount:
+          type: number
+          format: decimal
+        currency:
+          type: string
+          default: USDT
+        status:
+          type: string
+          enum: [pending, processing, completed, failed, cancelled]
+        blockchain_tx_hash:
+          type: string
+        confirmations:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        processed_at:
+          type: string
+          format: date-time
+
+    WithdrawalRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+        uuid:
+          type: string
+          format: uuid
+        amount:
+          type: number
+          format: decimal
+        fee:
+          type: number
+          format: decimal
+        net_amount:
+          type: number
+          format: decimal
+        destination_address:
+          type: string
+        status:
+          type: string
+          enum: [pending, processing, completed, rejected, cancelled]
+        created_at:
+          type: string
+          format: date-time
+        processed_at:
+          type: string
+          format: date-time
+
+    Commission:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum: [fast_start, binary, matching]
+        amount:
+          type: number
+          format: decimal
+        percentage:
+          type: number
+          format: decimal
+        base_amount:
+          type: number
+          format: decimal
+        level:
+          type: integer
+        left_leg_volume:
+          type: number
+          format: decimal
+        right_leg_volume:
+          type: number
+          format: decimal
+        weaker_leg_volume:
+          type: number
+          format: decimal
+        cycle_date:
+          type: string
+          format: date
+        created_at:
+          type: string
+          format: date-time
+
+    CommissionSummary:
+      type: object
+      properties:
+        total_earned:
+          type: number
+          format: decimal
+        fast_start_bonus:
+          type: number
+          format: decimal
+        binary_commission:
+          type: number
+          format: decimal
+        matching_bonus:
+          type: number
+          format: decimal
+        current_cycle:
+          type: number
+          format: decimal
+        last_cycle_date:
+          type: string
+          format: date
+
+    Rank:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        max_daily_earnings:
+          type: number
+          format: decimal
+        order_index:
+          type: integer
+
+    Membership:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum: [initial, monthly]
+        amount:
+          type: number
+          format: decimal
+        pv_value:
+          type: number
+          format: decimal
+        status:
+          type: string
+          enum: [pending, active, expired, cancelled]
+        starts_at:
+          type: string
+          format: date-time
+        expires_at:
+          type: string
+          format: date-time
+
+    Content:
+      type: object
+      properties:
+        id:
+          type: integer
+        uuid:
+          type: string
+          format: uuid
+        title:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+          enum: [video, document, quiz, zoom_meeting]
+        url:
+          type: string
+        duration:
+          type: integer
+          description: Duration in seconds
+        thumbnail_url:
+          type: string
+        required_rank:
+          $ref: '#/components/schemas/Rank'
+        is_free:
+          type: boolean
+        order_index:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+
+    ContentProgress:
+      type: object
+      properties:
+        id:
+          type: integer
+        content_id:
+          type: integer
+        status:
+          type: string
+          enum: [not_started, in_progress, completed]
+        progress_percentage:
+          type: integer
+        watch_time:
+          type: integer
+          description: Watch time in seconds
+        completed_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+        title:
+          type: string
+        message:
+          type: string
+        data:
+          type: object
+        is_read:
+          type: boolean
+        email_sent:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        read_at:
+          type: string
+          format: date-time
+
+    Pagination:
+      type: object
+      properties:
+        total:
+          type: integer
+        count:
+          type: integer
+        per_page:
+          type: integer
+        current_page:
+          type: integer
+        total_pages:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        errors:
+          type: object
+          description: Validation errors by field
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+tags:
+  - name: Authentication
+    description: User authentication and authorization
+  - name: User
+    description: User profile and account management
+  - name: Binary Tree
+    description: Binary MLM tree structure and management
+  - name: Transactions
+    description: Financial transactions and payments
+  - name: Commissions
+    description: Commission calculations and earnings
+  - name: Academy
+    description: Educational content and progress tracking
+  - name: Notifications
+    description: User notifications and alerts

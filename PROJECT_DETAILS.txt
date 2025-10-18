@@ -1,0 +1,53 @@
+PROJECT: Academia LMS + Sistema Multinivel Binario (Blueprint)
+
+CONTEXTO GENERAL
+- Frontend UI principal (admin & portal): WowDash React template — la carpeta completa del theme ya está en la raíz del repo (ruta: ./wowdash/ o ./wow-template/).
+- Backend objetivo: Laravel API (Laravel 10+). El backend actual NO está incluido en este repo; construiremos la API que WowDash consumirá.
+- Ya tengo un documento llamado "binario.doc" (o similar) en la raíz que describe la lógica binaria básica. Este documento contiene la estructura del binario (left/right), reglas básicas y ejemplos. Los apuntes adicionales de negocio NO están en ese doc; los agrego a continuación (resumen).
+
+APUNTES ADICIONALES (REGLAS DE NEGOCIO IMPORTANTES)
+- 2FA: Soporte TOTP (Google Authenticator) + backup codes.
+- Membresías: Pagos mensuales (30 días). Cuando compras la membresía y la mensualidad está activa, se muestra tu rango.
+- Recordatorio de pago: Enviar correo 3 días antes del vencimiento. Estimación 12.000 correos ≈ $78/mes (usar SES u opción económica).
+- Notificaciones: Mensaje al comprar mensualidad; mensaje cuando consigues nuevo rango.
+- Cadencia: Cada periodo es de 30 días. Si se paga, se extiende 30 días desde `max(now, expires_at)`.
+- Estado inactivo: Si el usuario/membership está inactivo, no se cobran comisiones, no ve la academia, no puede retirar y no recibe comisiones.
+- Retiros: Mínimo 20 USDT, fee de 3%.
+- Automatizaciones externas: n8n para WhatsApp/flows/emails (VPS aparte) — fase separada, 2 semanas después del BackOffice.
+- Transparencia de red: Cada líder puede ver cuánta gente tiene en su red y los rangos distintos.
+- Banner editable: Espacio para banner en frontend; admin puede cambiarlo.
+- Social links: Menú superior con Instagram, YouTube y Facebook (editable en settings).
+- Búsqueda futura: Buscar por ID o email en la red binaria (feature planificado).
+- Unicidad: No duplicar email/username (unique constraints + heurísticas anti-multicuentas).
+- Video progress: Cada video puede marcarse como visto (tabla video_progress).
+- Zoom: Integración para entrar a la sala desde el módulo de academia (Zoom meetings).
+- Rango: Se consigue por sumatoria de ganancias de comisiones (bonos binario, eventos, etc.) — la fuente de ganancias se acumula.
+- Login UX: GIF para fondo de login.
+- Bono de igualación: Requiere reglas más detalladas (pendiente definir % y niveles).
+- Términos en checkout: El usuario debe aceptar términos antes de pagar; almacenar aceptación con timestamp + IP.
+
+PAGO ON-CHAIN (foco inicial)
+- Fase 1 (recomendado): Integrar gateway tipo NowPayments / CoinPayments para recibir USDT (BEP20) con webhooks — menor complejidad, rápido a producción.
+- Fase 2 (opcional): Smart contract propio + microservicio Node.js watcher para escuchar eventos on-chain y reconciliar pagos. Requiere auditoría de contratos.
+
+ENTREGABLES ESPERADOS (por Arquitecto)
+- Diagrama de arquitectura (texto + servicios a usar).
+- Diagrama ER con tablas principales y campos clave.
+- OpenAPI skeleton (endpoints críticos) en YAML (auth/2fa, memberships, payments/webhook, enrollments, commissions, withdrawals, video_progress, admin CRUD).
+- Backlog MVP (priorizado) con tareas, estimación horas y dependencias (p. ej. 4 sprints, 2 semanas = MVP).
+- Lista de riesgos y mitigaciones.
+- Checklist de deploy (Docker Compose, variables env, Redis, SES, S3/Vimeo, Node watcher).
+- Notas sobre qué archivos/ficheros ya existen en raíz: WowDash template (./wowdash) y doc binario (./binario.doc o similar).
+
+RESTRICCIONES Y REQUERIMIENTOS TÉCNICOS
+- PHP: Laravel 10+.
+- DB: MySQL 8 (CTE recursivas disponibles).
+- Cache/Queue: Redis + Laravel Queues + Horizon.
+- Videos: S3 o Vimeo/Cloudflare Stream (preferible para streaming).
+- Autenticación SPA: Laravel Sanctum (o Passport si se necesita OAuth).
+- DevOps: Docker Compose para dev, Dockerfile para producción.
+
+NOTA PARA EL AGENTE: 
+- El repo raíz contiene la plantilla WowDash (frontend). NO intentes modificar la plantilla ahora; el objetivo del Arquitecto es definir la arquitectura, el API contract y backlog. 
+- Incluye recomendaciones para la implementación del binario (jobs diarios, pairing logic, tablas necesarias).
+- Entregar todo en formato texto estructurado y artefactos (ER ascii, YAML OpenAPI skeleton, backlog en Markdown/CSV).
