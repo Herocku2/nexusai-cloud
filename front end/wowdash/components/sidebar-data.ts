@@ -32,105 +32,21 @@ export const data = {
     },
     // ===== BINARIO / MLM =====
     {
-      title: "Mi Red Binaria",
-      url: "#",
+      title: "Mi Equipo",
+      url: "/dashboard/team",
       icon: Network,
-      isActive: true,
-      items: [
-        {
-          title: "Árbol Binario",
-          url: "/binary-tree",
-          circleColor: "bg-primary",
-        },
-        {
-          title: "Mi Red",
-          url: "/my-network",
-          circleColor: "bg-green-600",
-        },
-        {
-          title: "Patrocinados",
-          url: "/sponsored",
-          circleColor: "bg-blue-500",
-        },
-        {
-          title: "Genealogía",
-          url: "/genealogy",
-          circleColor: "bg-purple-600",
-        },
-      ],
     },
     // ===== COMISIONES =====
     {
       title: "Comisiones",
-      url: "#",
+      url: "/dashboard/commissions",
       icon: TrendingUp,
-      isActive: true,
-      items: [
-        {
-          title: "Resumen de Ganancias",
-          url: "/commissions/earnings",
-          circleColor: "bg-green-600",
-        },
-        {
-          title: "Historial",
-          url: "/commissions/history",
-          circleColor: "bg-blue-500",
-        },
-        {
-          title: "Bono Inicio Rápido",
-          url: "/commissions/fast-start",
-          circleColor: "bg-yellow-500",
-        },
-        {
-          title: "Bono Binario",
-          url: "/commissions/binary",
-          circleColor: "bg-primary",
-        },
-        {
-          title: "Bono Igualación",
-          url: "/commissions/matching",
-          circleColor: "bg-purple-600",
-        },
-        {
-          title: "Reportes",
-          url: "/commissions/reports",
-          circleColor: "bg-cyan-500",
-        },
-      ],
     },
     // ===== WALLET / FINANZAS =====
     {
       title: "Billetera",
-      url: "#",
+      url: "/dashboard/wallet",
       icon: Wallet,
-      isActive: true,
-      items: [
-        {
-          title: "Balance",
-          url: "/wallet/balance",
-          circleColor: "bg-green-600",
-        },
-        {
-          title: "Depositar USDT",
-          url: "/wallet/deposit",
-          circleColor: "bg-blue-500",
-        },
-        {
-          title: "Retirar Fondos",
-          url: "/wallet/withdraw",
-          circleColor: "bg-red-600",
-        },
-        {
-          title: "Transacciones",
-          url: "/wallet/transactions",
-          circleColor: "bg-purple-600",
-        },
-        {
-          title: "Membresía",
-          url: "/wallet/membership",
-          circleColor: "bg-yellow-500",
-        },
-      ],
     },
     // ===== RANGOS =====
     {
@@ -223,26 +139,8 @@ export const data = {
     // ===== PERFIL =====
     {
       title: "Mi Perfil",
-      url: "#",
+      url: "/dashboard/profile",
       icon: UsersRound,
-      isActive: true,
-      items: [
-        {
-          title: "Información Personal",
-          url: "/profile/info",
-          circleColor: "bg-primary",
-        },
-        {
-          title: "Seguridad",
-          url: "/profile/security",
-          circleColor: "bg-red-600",
-        },
-        {
-          title: "Configuración",
-          url: "/profile/settings",
-          circleColor: "bg-yellow-500",
-        },
-      ],
     },
     // ===== SOPORTE =====
     {
