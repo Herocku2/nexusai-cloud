@@ -32,9 +32,11 @@ const RegisterForm = () => {
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      username: "",
+      firstName: "",
+      lastName: "",
       email: "",
       password: "",
+      sponsorId: "",
     },
   });
 
@@ -87,10 +89,10 @@ const RegisterForm = () => {
           onSubmit={form.handleSubmit(handleRegisterFormSubmit)}
           className="space-y-5"
         >
-          {/* Username Field */}
+          {/* First Name Field */}
           <FormField
             control={form.control}
-            name="username"
+            name="firstName"
             render={({ field }) => (
               <FormItem>
                 <FormControl>
@@ -99,8 +101,32 @@ const RegisterForm = () => {
                     <Input
                       {...field}
                       type="text"
-                      placeholder="Username"
-                      name="username"
+                      placeholder="First Name"
+                      name="firstName"
+                      className="ps-13 pe-12 h-14 rounded-xl bg-neutral-100 dark:bg-slate-800 border border-neutral-300 dark:border-slate-700 focus:border-primary dark:focus:border-primary focus-visible:border-primary !shadow-none !ring-0"
+                      disabled={loading}
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Last Name Field */}
+          <FormField
+            control={form.control}
+            name="lastName"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <div className="relative">
+                    <UserRound className="absolute start-5 top-1/2 transform -translate-y-1/2 text-xl text-neutral-700 dark:text-neutral-200 w-5 h-5" />
+                    <Input
+                      {...field}
+                      type="text"
+                      placeholder="Last Name"
+                      name="lastName"
                       className="ps-13 pe-12 h-14 rounded-xl bg-neutral-100 dark:bg-slate-800 border border-neutral-300 dark:border-slate-700 focus:border-primary dark:focus:border-primary focus-visible:border-primary !shadow-none !ring-0"
                       disabled={loading}
                     />
@@ -163,6 +189,30 @@ const RegisterForm = () => {
                         <Eye className="w-5 h-5" />
                       )}
                     </Button>
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Sponsor ID Field (Optional) */}
+          <FormField
+            control={form.control}
+            name="sponsorId"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <div className="relative">
+                    <UserRound className="absolute start-5 top-1/2 transform -translate-y-1/2 text-xl text-neutral-700 dark:text-neutral-200 w-5 h-5" />
+                    <Input
+                      {...field}
+                      type="text"
+                      placeholder="Sponsor ID (Optional)"
+                      name="sponsorId"
+                      className="ps-13 pe-12 h-14 rounded-xl bg-neutral-100 dark:bg-slate-800 border border-neutral-300 dark:border-slate-700 focus:border-primary dark:focus:border-primary focus-visible:border-primary !shadow-none !ring-0"
+                      disabled={loading}
+                    />
                   </div>
                 </FormControl>
                 <FormMessage />
