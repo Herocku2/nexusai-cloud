@@ -1,19 +1,42 @@
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 import { updateSession } from '@/utils/supabase/middleware'
-import { NextRequest } from 'next/server'
+
+// Lista de rutas de admin
+const adminRoutes = [
+  '/admin/dashboard',
+  '/admin/users',
+  '/admin/courses',
+  '/admin/withdrawals',
+  '/admin/deposits',
+  '/admin/memberships',
+  '/admin/settings',
+]
 
 export async function middleware(request: NextRequest) {
-  return await updateSession(request)
+  const { pathname } = request.nextUrl
+
+  // Verificar si es una ruta de admin
+  const isAdminRoute = adminRoutes.some(route => pathname.startsWith(route))
+
+  // Para rutas de admin, verificar cookie de admin
+  if (isAdminRoute) {
+    const adminAuth = request.cookies.get('admin_authenticated')
+    
+    if (!adminAuth?.value) {
+      return NextResponse.redirect(new URL('/admin/login', request.url))
+    }
+    
+    return NextResponse.next()
+  }
+
+  // Para rutas de usuario, usar el middleware de Supabase
+  return updateSession(request)
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public files (public assets)
-     */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/dashboard/:path*',
+    '/admin/:path*',
   ],
 }

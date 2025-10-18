@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Shield } from "lucide-react";
 import { adminLogin } from "@/app/actions/admin";
 import { redirect } from "next/navigation";
+import { cookies } from 'next/headers';
 
 export default function AdminLoginPage() {
   async function handleLogin(formData: FormData) {
@@ -12,6 +13,13 @@ export default function AdminLoginPage() {
     const result = await adminLogin(formData)
     
     if (result.success) {
+      // Establecer cookie de admin
+      cookies().set('admin_authenticated', 'true', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7, // 7 días
+      })
       redirect('/admin/dashboard')
     }
     
