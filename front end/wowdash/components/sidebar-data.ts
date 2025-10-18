@@ -17,6 +17,7 @@ import {
   TrendingUp,
   Award,
   Users,
+  DollarSign,
 } from "lucide-react";
 
 export const data = {
@@ -47,6 +48,12 @@ export const data = {
       title: "Billetera",
       url: "/dashboard/wallet",
       icon: Wallet,
+    },
+    // ===== PAGOS =====
+    {
+      title: "Pagos & Depósitos",
+      url: "/dashboard/payments",
+      icon: DollarSign,
     },
     // ===== RANGOS =====
     {
@@ -83,41 +90,8 @@ export const data = {
     // ===== ACADEMIA LMS =====
     {
       title: "Academia",
-      url: "#",
+      url: "/dashboard/academy",
       icon: GraduationCap,
-      isActive: true,
-      items: [
-        {
-          title: "Mis Cursos",
-          url: "/academy/courses",
-          circleColor: "bg-primary",
-        },
-        {
-          title: "Categorías",
-          url: "/academy/categories",
-          circleColor: "bg-blue-500",
-        },
-        {
-          title: "Mi Progreso",
-          url: "/academy/progress",
-          circleColor: "bg-green-600",
-        },
-        {
-          title: "Certificados",
-          url: "/academy/certificates",
-          circleColor: "bg-yellow-500",
-        },
-        {
-          title: "Clases en Vivo",
-          url: "/academy/live-classes",
-          circleColor: "bg-red-600",
-        },
-        {
-          title: "Recursos",
-          url: "/academy/resources",
-          circleColor: "bg-purple-600",
-        },
-      ],
     },
     {
       label: "Comunicación",
