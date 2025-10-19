@@ -1,0 +1,31 @@
+<svg width="300" height="80" viewBox="0 0 300 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Gradient Definitions -->
+  <defs>
+    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8B5CF6;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1E40AF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Icon Circle Background -->
+  <circle cx="40" cy="40" r="35" fill="url(#logoGradient)"/>
+  
+  <!-- Stylized "N" in circle -->
+  <path d="M25 52 L25 28 L28 28 L48 48 L48 28 L51 28 L51 52 L48 52 L28 32 L28 52 Z" fill="white" stroke="white" stroke-width="0.5"/>
+  
+  <!-- Neural dots -->
+  <circle cx="20" cy="20" r="2" fill="white" opacity="0.6"/>
+  <circle cx="60" cy="20" r="2" fill="white" opacity="0.6"/>
+  <circle cx="40" cy="60" r="2" fill="white" opacity="0.6"/>
+  <line x1="20" y1="20" x2="40" y2="30" stroke="white" stroke-width="0.8" opacity="0.4"/>
+  <line x1="60" y1="20" x2="40" y2="30" stroke="white" stroke-width="0.8" opacity="0.4"/>
+  <line x1="40" y1="50" x2="40" y2="60" stroke="white" stroke-width="0.8" opacity="0.4"/>
+  
+  <!-- "NEXUS AI" Text -->
+  <text x="90" y="38" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="url(#textGradient)">NEXUS</text>
+  <text x="90" y="60" font-family="Arial, sans-serif" font-size="20" font-weight="300" fill="#6B7280">AI Academy</text>
+</svg>
