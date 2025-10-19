@@ -36,7 +36,6 @@ export async function createDepositRequest(formData: FormData) {
     user_id: user.id,
     type: 'deposit',
     amount,
-    status: 'pending',
     notes: `USDT Deposit via ${network}`,
     metadata: {
       tx_hash: txHash,
@@ -111,11 +110,9 @@ export async function activateMembership(amount: number = 100) {
   // Crear membresía
   const membership: MembershipInsert = {
     user_id: user.id,
-    type: 'standard',
+    type: 'initial',
     amount: amount,
-    pv_value: 100, // Valor en PV de la membresía
-    status: 'active',
-    starts_at: new Date().toISOString(),
+    started_at: new Date().toISOString(),
   }
 
   const { error: membershipError } = await supabase
@@ -129,9 +126,8 @@ export async function activateMembership(amount: number = 100) {
   // Crear transacción de membresía
   const transaction: TransactionInsert = {
     user_id: user.id,
-    type: 'membership_payment',
+    type: 'membership',
     amount: -amount,
-    status: 'completed',
     notes: 'Standard Membership Activation',
   }
 

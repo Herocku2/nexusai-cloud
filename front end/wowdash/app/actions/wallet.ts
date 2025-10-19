@@ -43,10 +43,8 @@ export async function requestWithdrawal(formData: FormData) {
   const withdrawal: WithdrawalRequestInsert = {
     user_id: user.id,
     amount,
-    destination_address: destinationAddress,
-    network,
-    currency: 'USDT',
-    status: 'pending',
+    wallet_address: destinationAddress,
+    network: network as 'TRC20' | 'ERC20',
   }
 
   const { error } = await supabase

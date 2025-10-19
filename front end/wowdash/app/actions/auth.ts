@@ -56,20 +56,18 @@ export async function signup(formData: FormData) {
   }
 
   // 2. Crear perfil de usuario
-  const profile: UserProfile = {
-    id: authData.user.id,
-    first_name: firstName,
-    last_name: lastName,
-    sponsor_id: sponsorId || null,
-    status: 'pending',
-    balance: 0,
-    total_earnings: 0,
-    total_pv: 0,
-  }
-
   const { error: profileError } = await supabase
     .from('user_profiles')
-    .insert(profile)
+    .insert({
+      user_id: authData.user.id,
+      first_name: firstName,
+      last_name: lastName,
+      sponsor_id: sponsorId || null,
+      status: 'inactive',
+      balance: 0,
+      total_earnings: 0,
+      total_pv: 0,
+    })
 
   if (profileError) {
     console.error('Error creating profile:', profileError)

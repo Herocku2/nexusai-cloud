@@ -116,7 +116,7 @@ export async function updateCourseProgress(contentId: string, progressPercentage
     // Crear nuevo registro de progreso
     const newProgress: UserContentProgressInsert = {
       user_id: user.id,
-      content_id: parseInt(contentId),
+      content_id: contentId,
       progress_percentage: progressPercentage,
       status,
       completed_at: isCompleted ? new Date().toISOString() : null,

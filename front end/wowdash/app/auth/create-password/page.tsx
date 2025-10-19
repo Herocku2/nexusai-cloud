@@ -1,5 +1,3 @@
-'use client'
-
 import { Metadata } from "next";
 import Link from "next/link";
 import CreatePasswordComponent from "@/components/auth/create-password-component";

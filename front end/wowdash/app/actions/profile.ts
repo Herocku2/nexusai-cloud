@@ -19,8 +19,7 @@ export async function updateProfile(formData: FormData) {
     first_name: formData.get('firstName') as string,
     last_name: formData.get('lastName') as string,
     phone: formData.get('phone') as string || null,
-    country_code: formData.get('country') as string || null,
-    date_of_birth: formData.get('dateOfBirth') as string || null,
+    country: formData.get('country') as string || null,
   }
 
   const { error } = await supabase
