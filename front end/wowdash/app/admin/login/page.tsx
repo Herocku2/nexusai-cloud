@@ -14,7 +14,7 @@ export default function AdminLoginPage() {
     
     if (result.success) {
       // Establecer cookie de admin
-      cookies().set('admin_authenticated', 'true', {
+      (await cookies()).set('admin_authenticated', 'true', {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
@@ -23,7 +23,13 @@ export default function AdminLoginPage() {
       redirect('/admin/dashboard')
     }
     
-    return result
+    // Si hay error, guardarlo en cookie temporal para mostrarlo
+    if (result.error) {
+      (await cookies()).set('admin_login_error', result.error, {
+        httpOnly: false, // Accesible desde el cliente
+        maxAge: 5, // Solo 5 segundos
+      })
+    }
   }
 
   return (

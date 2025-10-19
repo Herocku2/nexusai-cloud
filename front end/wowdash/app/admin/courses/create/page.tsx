@@ -17,7 +17,12 @@ export default function CreateCoursePage() {
       redirect('/admin/courses')
     }
     
-    return result
+    // Si hay error, podríamos manejarlo aquí
+    // Por ahora, simplemente no retornamos nada para cumplir con el tipo void
+    if (result.error) {
+      console.error('Error creating course:', result.error)
+      // Aquí podrías lanzar un error o manejarlo de otra forma
+    }
   }
 
   return (
