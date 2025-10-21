@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Shield, Users, BookOpen, DollarSign, Settings, LayoutDashboard, CreditCard, TrendingUp } from "lucide-react";
+import { Shield, Users, BookOpen, DollarSign, Settings, LayoutDashboard, CreditCard, TrendingUp, GitBranch } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Admin Area - Nexus AI MLM",
@@ -10,6 +10,7 @@ export const metadata: Metadata = {
 const navigation = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
   { name: 'Users', href: '/admin/users', icon: Users },
+  { name: 'Binary Tree', href: '/admin/binary-tree', icon: GitBranch },
   { name: 'Courses', href: '/admin/courses', icon: BookOpen },
   { name: 'Withdrawals', href: '/admin/withdrawals', icon: DollarSign },
   { name: 'Deposits', href: '/admin/deposits', icon: TrendingUp },
