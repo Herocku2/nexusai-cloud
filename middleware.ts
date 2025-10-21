@@ -2,18 +2,9 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { updateSession } from '@/utils/supabase/middleware'
 import { createServerClient } from '@supabase/ssr'
-import createMiddleware from 'next-intl/middleware'
-import { locales, defaultLocale } from './i18n'
 
 // Email del admin
 const ADMIN_EMAIL = 'admin@nexusai.com'
-
-// Middleware de internacionalización
-const intlMiddleware = createMiddleware({
-  locales,
-  defaultLocale,
-  localePrefix: 'as-needed' // No agregar prefijo para el idioma por defecto (es)
-})
 
 // Lista de rutas de admin
 const adminRoutes = [
@@ -31,15 +22,12 @@ const adminRoutes = [
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Aplicar middleware de internacionalización primero
-  const intlResponse = intlMiddleware(request)
-  
-  // Si el middleware de i18n redirige (cambio de idioma), retornar esa respuesta
-  if (intlResponse.headers.get('x-middleware-rewrite') || intlResponse.status === 307) {
-    return intlResponse
+  // Excluir la ruta de login de admin de las verificaciones
+  if (pathname === '/admin/login') {
+    return NextResponse.next()
   }
 
-  // Verificar si es una ruta de admin
+  // Verificar si es una ruta de admin (excepto login)
   const isAdminRoute = adminRoutes.some(route => pathname.startsWith(route))
 
   // Para rutas de admin, verificar autenticación de Supabase
@@ -74,10 +62,17 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url)
     }
 
-    // Verificar que el usuario sea admin
-    if (user.email !== ADMIN_EMAIL) {
+    // Verificar flag is_admin en la base de datos (mínima query necesaria)
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('is_admin')
+      .eq('id', user.id)
+      .single()
+
+    if (!profile || !profile.is_admin) {
       const url = request.nextUrl.clone()
       url.pathname = '/admin/login'
+      url.searchParams.set('error', 'Unauthorized: Admin access required')
       return NextResponse.redirect(url)
     }
     
@@ -92,14 +87,11 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Rutas protegidas por autenticación
     '/dashboard/:path*',
     '/admin/:path*',
     '/auth/callback',
     '/messages',
     '/notifications',
     '/support/:path*',
-    // Rutas de i18n (excluir archivos estáticos)
-    '/((?!api|_next|_vercel|.*\\..*).*)',
   ],
 }

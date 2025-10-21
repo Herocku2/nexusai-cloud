@@ -11,11 +11,19 @@ import Image from "next/image";
 import Link from "next/link";
 import Logout from "@/components/auth/logout";
 import userImg from "@/public/assets/images/user.png";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/lib/hooks/useAuth";
 
 const ProfileDropdown = () => {
-  const { data: session } = useSession();
-  console.log("session", session?.user?.image);
+  const { user, loading } = useAuth();
+  
+  // Datos del usuario actual desde Supabase
+  const displayName = user?.profile?.first_name && user?.profile?.last_name
+    ? `${user.profile.first_name} ${user.profile.last_name}`
+    : user?.email?.split('@')[0] || 'User';
+  
+  // Usar type assertion para is_admin ya que el tipo no está actualizado
+  const isAdmin = (user?.profile as any)?.is_admin || false;
+  const userRole = isAdmin ? 'Admin' : 'User';
 
   return (
     <DropdownMenu>
@@ -26,24 +34,15 @@ const ProfileDropdown = () => {
           className={cn(
             "rounded-full sm:w-10 sm:h-10 w-8 h-8 bg-gray-200/75 hover:bg-slate-200 focus-visible:ring-0 dark:bg-slate-700 dark:hover:bg-slate-600 border-0 cursor-pointer data-[state=open]:bg-gray-300 data-[state=open]:ring-4 data-[state=open]:ring-slate-300 dark:data-[state=open]:ring-slate-500 dark:data-[state=open]:bg-slate-600"
           )}
+          disabled={loading}
         >
-          {session?.user?.image ? (
-            <Image
-              src={session?.user?.image}
-              className="rounded-full"
-              width={40}
-              height={40}
-              alt={session?.user?.name ?? "User profile"}
-            />
-          ) : (
-            <Image
-              src={userImg}
-              className="rounded-full"
-              width={40}
-              height={40}
-              alt={"User profile"}
-            />
-          )}
+          <Image
+            src={userImg}
+            className="rounded-full"
+            width={40}
+            height={40}
+            alt={displayName}
+          />
         </Button>
       </DropdownMenuTrigger>
 
@@ -55,12 +54,10 @@ const ProfileDropdown = () => {
         <div className="py-3 px-4 rounded-lg bg-primary/10 dark:bg-primar flex items-center justify-between">
           <div>
             <h6 className="text-lg text-neutral-900 dark:text-white font-semibold mb-0">
-              {session?.user?.image && session?.user?.name
-                ? session?.user?.name
-                : "Robiul Hasan"}
+              {loading ? 'Loading...' : displayName}
             </h6>
             <span className="text-sm text-neutral-500 dark:text-neutral-300">
-              Admin
+              {loading ? '' : userRole}
             </span>
           </div>
         </div>

@@ -3,9 +3,12 @@ import { getUser } from '@/app/actions/auth'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { signOut } from '@/app/actions/auth'
+import { getTranslations } from '@/lib/translations'
 
 export default async function DashboardPage() {
   const user = await getUser()
+  const t = await getTranslations('dashboard_page')
+  const tCommon = await getTranslations('dashboard')
 
   if (!user) {
     redirect('/auth/login')
@@ -21,7 +24,7 @@ export default async function DashboardPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">
-            Welcome, {user.profile?.first_name || 'User'}!
+            {t('welcome')}, {user.profile?.first_name || 'User'}!
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
             {user.email}
@@ -29,7 +32,7 @@ export default async function DashboardPage() {
         </div>
         <form action={handleSignOut}>
           <Button variant="outline" type="submit">
-            Sign Out
+            {t('signOut')}
           </Button>
         </form>
       </div>
@@ -37,25 +40,25 @@ export default async function DashboardPage() {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardDescription>Balance</CardDescription>
+            <CardDescription>{tCommon('balance')}</CardDescription>
             <CardTitle className="text-2xl">
               ${user.profile?.balance?.toFixed(2) || '0.00'}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-gray-500">USDT Available</p>
+            <p className="text-xs text-gray-500">{t('usdtAvailable')}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardDescription>Total Earnings</CardDescription>
+            <CardDescription>{tCommon('totalEarnings')}</CardDescription>
             <CardTitle className="text-2xl">
               ${user.profile?.total_earnings?.toFixed(2) || '0.00'}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-gray-500">Lifetime Commissions</p>
+            <p className="text-xs text-gray-500">{t('lifetimeCommissions')}</p>
           </CardContent>
         </Card>
 
@@ -67,56 +70,56 @@ export default async function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-gray-500">Point Value</p>
+            <p className="text-xs text-gray-500">{t('pointValue')}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardDescription>Status</CardDescription>
+            <CardDescription>{t('status')}</CardDescription>
             <CardTitle className="text-2xl capitalize">
-              {user.profile?.status || 'Pending'}
+              {user.profile?.status || t('pending')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-gray-500">Account Status</p>
+            <p className="text-xs text-gray-500">{t('accountStatus')}</p>
           </CardContent>
         </Card>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Welcome to Nexus AI</CardTitle>
+          <CardTitle>{t('welcomeTitle')}</CardTitle>
           <CardDescription>
-            Your MLM Binary + Academy LMS Platform
+            {t('welcomeSubtitle')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="rounded-lg bg-blue-50 dark:bg-blue-900/20 p-4">
-            <h3 className="font-semibold mb-2">🚀 Getting Started</h3>
+            <h3 className="font-semibold mb-2">{t('gettingStarted')}</h3>
             <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-              <li>• Complete your profile information</li>
-              <li>• Purchase your initial membership ($89 USDT = 100 PV)</li>
-              <li>• Start referring others to build your team</li>
-              <li>• Access the academy content to learn</li>
-              <li>• Track your commissions and earnings</li>
+              <li>{t('step1')}</li>
+              <li>{t('step2')}</li>
+              <li>{t('step3')}</li>
+              <li>{t('step4')}</li>
+              <li>{t('step5')}</li>
             </ul>
           </div>
 
           <div className="rounded-lg bg-purple-50 dark:bg-purple-900/20 p-4">
-            <h3 className="font-semibold mb-2">💰 Commission Types</h3>
+            <h3 className="font-semibold mb-2">{t('commissionTypes')}</h3>
             <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-              <li>• <strong>Fast Start:</strong> $40 (Level 1) + $8 (Level 2)</li>
-              <li>• <strong>Binary:</strong> 50% of weaker leg volume</li>
-              <li>• <strong>Matching Bonus:</strong> Up to 50% of directs' binary (5 levels)</li>
+              <li>• <strong>{t('fastStart')}:</strong> $40 (Level 1) + $8 (Level 2)</li>
+              <li>• <strong>{t('binary')}:</strong> {t('weakerLegVolume')}</li>
+              <li>• <strong>{t('matchingBonus')}:</strong> {t('matchingBonusDesc')}</li>
             </ul>
           </div>
 
           {user.profile?.sponsor_id && (
             <div className="rounded-lg bg-green-50 dark:bg-green-900/20 p-4">
-              <h3 className="font-semibold mb-2">👤 Your Sponsor</h3>
+              <h3 className="font-semibold mb-2">{t('yourSponsor')}</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Sponsor ID: {user.profile.sponsor_id}
+                {t('sponsorId')}: {user.profile.sponsor_id}
               </p>
             </div>
           )}

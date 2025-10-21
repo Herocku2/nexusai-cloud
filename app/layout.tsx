@@ -1,8 +1,6 @@
 import { LoadingProvider } from "@/contexts/LoadingContext";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
 import "./globals.css";
 const inter = Inter({
   subsets: ["latin"],
@@ -47,22 +45,15 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
-  params: { locale }
 }: Readonly<{
   children: React.ReactNode;
-  params: { locale: string };
 }>) {
-  // Obtener mensajes de traducción para el locale actual
-  const messages = await getMessages();
-  
   return (
-    <html lang={locale || 'es'} suppressHydrationWarning>
+    <html lang="es" suppressHydrationWarning>
       <body className={`${inter.className} antialiased`}>
-        <NextIntlClientProvider messages={messages}>
-          <LoadingProvider>
-            {children}
-          </LoadingProvider>
-        </NextIntlClientProvider>
+        <LoadingProvider>
+          {children}
+        </LoadingProvider>
       </body>
     </html>
   );

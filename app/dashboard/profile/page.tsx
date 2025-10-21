@@ -6,10 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { User, Mail, Shield, Calendar } from "lucide-react";
 import { getProfile, updateProfile } from "@/app/actions/profile";
+import { getTranslations } from "@/lib/translations";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  const t = await getTranslations('profile_page');
   
   if (!user) {
     redirect("/auth/login");
@@ -20,7 +22,7 @@ export default async function ProfilePage() {
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">My Profile</h1>
+        <h1 className="text-3xl font-bold">{t('myProfile')}</h1>
       </div>
 
       {/* Profile Info Card */}
@@ -29,13 +31,13 @@ export default async function ProfilePage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="h-5 w-5" />
-              Personal Information
+              {t('personalInformation')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <form action={updateProfile} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="firstName">First Name</Label>
+                <Label htmlFor="firstName">{t('firstName')}</Label>
                 <Input
                   id="firstName"
                   name="firstName"
@@ -45,7 +47,7 @@ export default async function ProfilePage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="lastName">Last Name</Label>
+                <Label htmlFor="lastName">{t('lastName')}</Label>
                 <Input
                   id="lastName"
                   name="lastName"
@@ -55,7 +57,7 @@ export default async function ProfilePage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
+                <Label htmlFor="phone">{t('phoneNumber')}</Label>
                 <Input
                   id="phone"
                   name="phone"
@@ -66,7 +68,7 @@ export default async function ProfilePage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="country">Country Code</Label>
+                <Label htmlFor="country">{t('countryCode')}</Label>
                 <Input
                   id="country"
                   name="country"
@@ -76,7 +78,7 @@ export default async function ProfilePage() {
               </div>
 
               <Button type="submit" className="w-full">
-                Update Profile
+                {t('updateProfile')}
               </Button>
             </form>
           </CardContent>
@@ -88,26 +90,26 @@ export default async function ProfilePage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Mail className="h-5 w-5" />
-                Account Information
+                {t('accountInformation')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div>
-                <p className="text-sm text-muted-foreground">Email</p>
+                <p className="text-sm text-muted-foreground">{t('email')}</p>
                 <p className="font-medium">{user.email}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">User ID</p>
+                <p className="text-sm text-muted-foreground">{t('userId')}</p>
                 <p className="font-mono text-sm">{user.id.slice(0, 8)}...</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Sponsor ID</p>
+                <p className="text-sm text-muted-foreground">{t('sponsorId')}</p>
                 <p className="font-medium">
-                  {profile?.sponsor_id ? profile.sponsor_id.slice(0, 8) + "..." : "None"}
+                  {profile?.sponsor_id ? profile.sponsor_id.slice(0, 8) + "..." : t('none')}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Member Since</p>
+                <p className="text-sm text-muted-foreground">{t('memberSince')}</p>
                 <p className="font-medium">
                   {new Date(profile?.created_at || user.created_at).toLocaleDateString('en-US', {
                     month: 'long',
@@ -124,12 +126,12 @@ export default async function ProfilePage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Shield className="h-5 w-5" />
-                Account Status
+                {t('accountStatus')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">Status</p>
+                <p className="text-sm text-muted-foreground">{t('status')}</p>
                 <span
                   className={`px-3 py-1 rounded-full text-xs font-medium ${
                     profile?.status === "active"
@@ -137,11 +139,11 @@ export default async function ProfilePage() {
                       : "bg-yellow-500/10 text-yellow-500"
                   }`}
                 >
-                  {profile?.status?.toUpperCase() || "PENDING"}
+                  {profile?.status?.toUpperCase() || t('pending').toUpperCase()}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">Email Verified</p>
+                <p className="text-sm text-muted-foreground">{t('emailVerified')}</p>
                 <span
                   className={`px-3 py-1 rounded-full text-xs font-medium ${
                     user.email_confirmed_at
@@ -149,13 +151,13 @@ export default async function ProfilePage() {
                       : "bg-red-500/10 text-red-500"
                   }`}
                 >
-                  {user.email_confirmed_at ? "VERIFIED" : "NOT VERIFIED"}
+                  {user.email_confirmed_at ? t('verified').toUpperCase() : t('notVerified').toUpperCase()}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">Membership Type</p>
+                <p className="text-sm text-muted-foreground">{t('membershipType')}</p>
                 <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-500/10 text-blue-500">
-                  STANDARD
+                  {t('standard').toUpperCase()}
                 </span>
               </div>
             </CardContent>
@@ -166,41 +168,41 @@ export default async function ProfilePage() {
       {/* Wallet Address Card */}
       <Card className="card">
         <CardHeader>
-          <CardTitle>USDT Wallet Address</CardTitle>
+          <CardTitle>{t('usdtWalletAddress')}</CardTitle>
         </CardHeader>
         <CardContent>
           <form action={updateProfile} className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="walletAddress">TRC20 Address</Label>
+                <Label htmlFor="walletAddress">{t('trc20Address')}</Label>
                 <Input
                   id="walletAddress"
                   name="walletAddress"
                   type="text"
                   defaultValue={profile?.wallet_address || ""}
-                  placeholder="Enter your TRC20 USDT wallet address"
+                  placeholder={t('trc20Placeholder')}
                 />
                 <p className="text-xs text-muted-foreground">
-                  This address will be used for withdrawals
+                  {t('trc20Helper')}
                 </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="walletAddressERC20">ERC20 Address (Optional)</Label>
+                <Label htmlFor="walletAddressERC20">{t('erc20Address')}</Label>
                 <Input
                   id="walletAddressERC20"
                   name="walletAddressERC20"
                   type="text"
-                  placeholder="Enter your ERC20 USDT wallet address"
+                  placeholder={t('erc20Placeholder')}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Alternative withdrawal option
+                  {t('erc20Helper')}
                 </p>
               </div>
             </div>
 
             <Button type="submit">
-              Update Wallet Address
+              {t('updateWalletAddress')}
             </Button>
           </form>
         </CardContent>
@@ -209,27 +211,27 @@ export default async function ProfilePage() {
       {/* Referral Link Card */}
       <Card className="card">
         <CardHeader>
-          <CardTitle>Your Referral Link</CardTitle>
+          <CardTitle>{t('yourReferralLink')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div>
-              <Label>Share this link to invite new members</Label>
+              <Label>{t('shareLink')}</Label>
               <div className="flex gap-2 mt-2">
                 <Input
                   readOnly
-                  value={`${process.env.NEXT_PUBLIC_SITE_URL}/auth/register?sponsor=${user.id}`}
+                  value={`https://nexusai.cloud/auth/register?sponsor=${user.id}`}
                   className="font-mono text-sm"
                 />
                 <Button
                   type="button"
                   onClick={() => {
                     navigator.clipboard.writeText(
-                      `${process.env.NEXT_PUBLIC_SITE_URL}/auth/register?sponsor=${user.id}`
+                      `https://nexusai.cloud/auth/register?sponsor=${user.id}`
                     );
                   }}
                 >
-                  Copy
+                  {t('copy')}
                 </Button>
               </div>
             </div>

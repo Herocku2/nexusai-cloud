@@ -25,6 +25,7 @@ export interface Database {
           total_earnings: number
           total_pv: number
           status: 'active' | 'inactive' | 'suspended'
+          is_admin: boolean | null
           created_at: string
           updated_at: string
         }
@@ -40,6 +41,7 @@ export interface Database {
           total_earnings?: number
           total_pv?: number
           status?: 'active' | 'inactive' | 'suspended'
+          is_admin?: boolean | null
           created_at?: string
           updated_at?: string
         }
@@ -55,6 +57,7 @@ export interface Database {
           total_earnings?: number
           total_pv?: number
           status?: 'active' | 'inactive' | 'suspended'
+          is_admin?: boolean | null
           created_at?: string
           updated_at?: string
         }

@@ -4,13 +4,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { DollarSign, TrendingUp, TrendingDown, ArrowUpRight } from "lucide-react";
+import { DollarSign, TrendingUp, TrendingDown, ArrowUpRight, AlertTriangle } from "lucide-react";
 import { getWalletBalance, getWithdrawalHistory, requestWithdrawal } from "@/app/actions/wallet";
 import TransactionHistoryTable from "@/components/table/transaction-history-table";
+import { getTranslations } from "@/lib/translations";
 
 export default async function WalletPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  const t = await getTranslations('wallet_page');
   
   if (!user) {
     redirect("/auth/login");
@@ -18,11 +20,20 @@ export default async function WalletPage() {
 
   const walletData = await getWalletBalance();
   const withdrawals = await getWithdrawalHistory();
+  
+  // Verificar si el usuario tiene membresía activa
+  const { data: profile } = await supabase
+    .from('user_profiles')
+    .select('is_active')
+    .eq('id', user.id)
+    .single();
+  
+  const isActive = profile?.is_active ?? false;
 
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Wallet & Balance</h1>
+        <h1 className="text-3xl font-bold">{t('walletBalance')}</h1>
       </div>
 
       {/* Balance Cards */}
@@ -31,7 +42,7 @@ export default async function WalletPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Available Balance</p>
+                <p className="text-sm text-muted-foreground">{t('availableBalance')}</p>
                 <h3 className="text-2xl font-bold mt-2">
                   ${walletData?.balance?.toFixed(2) || "0.00"}
                 </h3>
@@ -47,7 +58,7 @@ export default async function WalletPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Total Earnings</p>
+                <p className="text-sm text-muted-foreground">{t('totalEarnings')}</p>
                 <h3 className="text-2xl font-bold mt-2">
                   ${walletData?.total_earnings?.toFixed(2) || "0.00"}
                 </h3>
@@ -63,7 +74,7 @@ export default async function WalletPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Pending Balance</p>
+                <p className="text-sm text-muted-foreground">{t('pendingBalance')}</p>
                 <h3 className="text-2xl font-bold mt-2">
                   ${walletData?.pending_withdrawals?.toFixed(2) || "0.00"}
                 </h3>
@@ -79,7 +90,7 @@ export default async function WalletPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Total Withdrawn</p>
+                <p className="text-sm text-muted-foreground">{t('totalWithdrawn')}</p>
                 <h3 className="text-2xl font-bold mt-2">
                   ${walletData?.total_withdrawn?.toFixed(2) || "0.00"}
                 </h3>
@@ -92,36 +103,62 @@ export default async function WalletPage() {
         </Card>
       </div>
 
+      {/* Alerta de Membresía Inactiva */}
+      {!isActive && (
+        <Card className="border-yellow-500/50 bg-yellow-500/5">
+          <CardContent className="p-6">
+            <div className="flex items-start gap-4">
+              <div className="h-12 w-12 rounded-full bg-yellow-500/10 flex items-center justify-center flex-shrink-0">
+                <AlertTriangle className="h-6 w-6 text-yellow-500" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-yellow-600 dark:text-yellow-400 mb-2">
+                  {t('membershipInactiveTitle') || 'Membresía Inactiva'}
+                </h3>
+                <p className="text-sm text-muted-foreground mb-3">
+                  {t('membershipInactiveMessage') || 'Tu membresía mensual está inactiva. No podrás realizar retiros hasta que renueves tu membresía de $29 USD.'}
+                </p>
+                <Button size="sm" className="bg-yellow-600 hover:bg-yellow-700">
+                  {t('renewMembership') || 'Renovar Membresía ($29 USD)'}
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Withdrawal Form */}
       <Card className="card">
         <CardHeader>
-          <CardTitle>Request Withdrawal</CardTitle>
+          <CardTitle>{t('requestWithdrawal')}</CardTitle>
         </CardHeader>
         <CardContent>
           <form action={requestWithdrawal} className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="amount">Amount (USDT)</Label>
+                <Label htmlFor="amount">{t('amount')} (USDT)</Label>
                 <Input
                   id="amount"
                   name="amount"
                   type="number"
                   step="0.01"
                   min="20"
-                  placeholder="Minimum $20 USDT"
+                  placeholder={t('amountPlaceholder')}
+                  disabled={!isActive}
                   required
                 />
                 <p className="text-xs text-muted-foreground">
-                  Minimum withdrawal: $20 USDT
+                  {t('minimumWithdrawal')}
                 </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="network">Network</Label>
+                <Label htmlFor="network">{t('network')}</Label>
                 <select
                   id="network"
                   name="network"
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  disabled={!isActive}
                   required
                 >
                   <option value="TRC20">TRC20 (Tron)</option>
@@ -130,19 +167,20 @@ export default async function WalletPage() {
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="destinationAddress">Wallet Address</Label>
+                <Label htmlFor="destinationAddress">{t('walletAddress')}</Label>
                 <Input
                   id="destinationAddress"
                   name="destinationAddress"
                   type="text"
-                  placeholder="Enter your USDT wallet address"
+                  placeholder={t('walletAddressPlaceholder')}
+                  disabled={!isActive}
                   required
                 />
               </div>
             </div>
 
-            <Button type="submit" className="w-full">
-              Request Withdrawal
+            <Button type="submit" className="w-full" disabled={!isActive}>
+              {t('requestWithdrawal')}
             </Button>
           </form>
         </CardContent>
@@ -151,7 +189,7 @@ export default async function WalletPage() {
       {/* Withdrawal History */}
       <Card className="card">
         <CardHeader>
-          <CardTitle>Withdrawal History</CardTitle>
+          <CardTitle>{t('withdrawalHistory')}</CardTitle>
         </CardHeader>
         <CardContent>
           {withdrawals && withdrawals.length > 0 ? (
@@ -177,7 +215,8 @@ export default async function WalletPage() {
                           : "bg-red-500/10 text-red-500"
                       }`}
                     >
-                      {withdrawal.status}
+                      {withdrawal.status === "completed" ? t('completed') : 
+                       withdrawal.status === "pending" ? t('pending') : t('rejected')}
                     </span>
                   </div>
                 </div>
@@ -185,7 +224,7 @@ export default async function WalletPage() {
             </div>
           ) : (
             <p className="text-center text-muted-foreground py-8">
-              No withdrawal history yet
+              {t('noWithdrawalHistory')}
             </p>
           )}
         </CardContent>

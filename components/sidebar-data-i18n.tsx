@@ -12,109 +12,131 @@ import {
   Mail,
   UsersRound,
   Settings,
+  GitBranch,
 } from "lucide-react";
-import { useTranslations } from 'next-intl';
+import { useMemo, useState, useEffect } from 'react';
+import esMessages from '@/messages/es.json';
+import enMessages from '@/messages/en.json';
+
+// Helper para obtener el idioma de las cookies del lado del cliente
+function getClientLocale() {
+  if (typeof document === 'undefined') return 'es';
+  const cookies = document.cookie.split('; ');
+  const localeCookie = cookies.find(c => c.startsWith('NEXT_LOCALE='));
+  return localeCookie ? localeCookie.split('=')[1] : 'es';
+}
 
 export function useSidebarData() {
-  const t = useTranslations('nav');
+  const [locale, setLocale] = useState('es');
   
-  return {
+  useEffect(() => {
+    setLocale(getClientLocale());
+  }, []);
+  
+  const messages = locale === 'es' ? esMessages : enMessages;
+  
+  return useMemo(() => ({
     navMain: [
       // ===== DASHBOARDS =====
       {
-        title: t('dashboard'),
+        title: messages.nav.dashboard,
         url: "/dashboard",
         icon: House,
       },
       {
-        label: "Red & Negocios",
+        label: messages.sidebar.networkBusiness,
       },
       // ===== BINARIO / MLM =====
       {
-        title: t('team'),
+        title: messages.nav.team,
         url: "/dashboard/team",
         icon: Network,
       },
+      {
+        title: messages.nav.binaryTree,
+        url: "/dashboard/binary-tree",
+        icon: GitBranch,
+      },
       // ===== COMISIONES =====
       {
-        title: t('commissions'),
+        title: messages.nav.commissions,
         url: "/dashboard/commissions",
         icon: TrendingUp,
       },
       // ===== WALLET / FINANZAS =====
       {
-        title: t('wallet'),
+        title: messages.nav.wallet,
         url: "/dashboard/wallet",
         icon: Wallet,
       },
       // ===== PAGOS =====
       {
-        title: t('payments'),
+        title: messages.nav.payments,
         url: "/dashboard/payments",
         icon: DollarSign,
       },
       // ===== RANGOS =====
       {
-        title: t('ranks'),
+        title: messages.nav.ranks,
         url: "/dashboard/ranks",
         icon: Award,
       },
       {
-        label: "Academia & Aprendizaje",
+        label: messages.sidebar.academyLearning,
       },
       // ===== ACADEMIA LMS =====
       {
-        title: t('academy'),
+        title: messages.nav.academy,
         url: "/dashboard/academy",
         icon: GraduationCap,
       },
       {
-        label: "Comunicación",
+        label: messages.sidebar.communication,
       },
       // ===== MENSAJERÍA =====
       {
-        title: t('messages'),
+        title: messages.nav.messages,
         url: "/messages",
         icon: MessageCircleMore,
       },
       {
-        title: t('notifications'),
+        title: messages.nav.notifications,
         url: "/notifications",
         icon: Mail,
       },
       {
-        label: "Configuración",
+        label: messages.sidebar.settings,
       },
       // ===== PERFIL =====
       {
-        title: t('profile'),
+        title: messages.nav.profile,
         url: "/dashboard/profile",
         icon: UsersRound,
       },
       // ===== SOPORTE =====
       {
-        title: "Ayuda & Soporte",
+        title: messages.sidebar.helpSupport,
         url: "#",
         icon: Settings,
         isActive: true,
         items: [
           {
-            title: "Centro de Ayuda",
+            title: messages.sidebar.helpCenter,
             url: "/dashboard/support",
             circleColor: "bg-primary",
           },
           {
-            title: "FAQs",
+            title: messages.sidebar.faqs,
             url: "/dashboard/support",
             circleColor: "bg-blue-500",
           },
           {
-            title: "Contactar Soporte",
+            title: messages.sidebar.contactSupport,
             url: "/dashboard/support",
             circleColor: "bg-green-600",
           },
         ],
       },
     ],
-  };
+  }), [locale]);
 }

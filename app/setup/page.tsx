@@ -24,11 +24,15 @@ export default function SetupPage() {
         <CardContent className="space-y-4">
           <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
             <h3 className="font-semibold mb-2">Test Users to Create:</h3>
+            <p className="text-sm text-muted-foreground mb-3">
+              🚨 <strong>SOLO PARA DESARROLLO:</strong> Este script crea usuarios de prueba con contraseñas predefinidas.
+              En producción, todos los usuarios deben crearse mediante el formulario de registro.
+            </p>
             <ul className="space-y-2 text-sm">
               <li className="p-2 bg-red-500/10 border border-red-500/20 rounded">
                 <strong className="text-red-600">ADMIN USER:</strong><br />
                 <strong>Email:</strong> admin@nexusai.com<br />
-                <strong>Password:</strong> NexusAdmin2024!SecurePass
+                <strong>Note:</strong> Contraseña definida en create-test-user.ts
               </li>
               <li>
                 <strong>Email:</strong> demo@nexusai.com<br />

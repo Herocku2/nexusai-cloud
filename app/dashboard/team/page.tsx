@@ -3,7 +3,10 @@ import { createClient } from "@/utils/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, TrendingUp, Network, Award } from "lucide-react";
 import { getDirectReferrals, getTeamVolume, getBinaryTree, getActiveMembers } from "@/app/actions/team";
+import { getPlacementPreference } from "@/app/actions/referral";
 import BinaryTreeVisualization from "@/components/mlm/BinaryTreeVisualization";
+import ReferralSection from "@/components/shared/referral-section";
+import { getTranslations } from "@/lib/translations";
 import {
   Table,
   TableBody,
@@ -16,6 +19,8 @@ import {
 export default async function TeamPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  const t = await getTranslations('team_page');
+  const tReferral = await getTranslations('referral');
   
   if (!user) {
     redirect("/auth/login");
@@ -25,12 +30,35 @@ export default async function TeamPage() {
   const teamVolume = await getTeamVolume();
   const activeMembers = await getActiveMembers();
   const binaryTree = await getBinaryTree(user.id, 3);
+  const { preference } = await getPlacementPreference();
 
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">My Team</h1>
+        <h1 className="text-3xl font-bold">{t('myTeam')}</h1>
       </div>
+
+      {/* Referral Link and Placement Preference */}
+      <ReferralSection 
+        userId={user.id}
+        currentPreference={preference}
+        translations={{
+          yourReferralLink: tReferral('yourReferralLink'),
+          shareThisLink: tReferral('shareThisLink'),
+          copy: tReferral('copy'),
+          copied: tReferral('copied'),
+          placementPreference: tReferral('placementPreference'),
+          selectLeg: tReferral('selectLeg'),
+          leftLeg: tReferral('leftLeg'),
+          rightLeg: tReferral('rightLeg'),
+          autoBalance: tReferral('autoBalance'),
+          currentPreference: tReferral('currentPreference'),
+          updatePreference: tReferral('updatePreference'),
+          leftLegDesc: tReferral('leftLegDesc'),
+          rightLegDesc: tReferral('rightLegDesc'),
+          autoBalanceDesc: tReferral('autoBalanceDesc'),
+        }}
+      />
 
       {/* Team Stats */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -38,7 +66,7 @@ export default async function TeamPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Direct Referrals</p>
+                <p className="text-sm text-muted-foreground">{t('directReferrals')}</p>
                 <h3 className="text-2xl font-bold mt-2">{referrals?.total || 0}</h3>
               </div>
               <div className="h-12 w-12 rounded-full bg-blue-500/10 flex items-center justify-center">
@@ -52,7 +80,7 @@ export default async function TeamPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Active Members</p>
+                <p className="text-sm text-muted-foreground">{t('activeMembers')}</p>
                 <h3 className="text-2xl font-bold mt-2">{activeMembers || 0}</h3>
               </div>
               <div className="h-12 w-12 rounded-full bg-green-500/10 flex items-center justify-center">
@@ -66,7 +94,7 @@ export default async function TeamPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Left Leg Volume</p>
+                <p className="text-sm text-muted-foreground">{t('leftLegVolume')}</p>
                 <h3 className="text-2xl font-bold mt-2">{teamVolume?.left || 0} PV</h3>
               </div>
               <div className="h-12 w-12 rounded-full bg-purple-500/10 flex items-center justify-center">
@@ -80,7 +108,7 @@ export default async function TeamPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Right Leg Volume</p>
+                <p className="text-sm text-muted-foreground">{t('rightLegVolume')}</p>
                 <h3 className="text-2xl font-bold mt-2">{teamVolume?.right || 0} PV</h3>
               </div>
               <div className="h-12 w-12 rounded-full bg-orange-500/10 flex items-center justify-center">
@@ -97,26 +125,26 @@ export default async function TeamPage() {
       {/* Team Members Table */}
       <Card className="card">
         <CardHeader>
-          <CardTitle>Team Members</CardTitle>
+          <CardTitle>{t('teamMembers')}</CardTitle>
         </CardHeader>
         <CardContent>
           <Table className="table-auto border-spacing-0 border-separate">
             <TableHeader>
               <TableRow className="border-0">
                 <TableHead className="bg-neutral-100 dark:bg-slate-700 border-t border-neutral-200 dark:border-slate-600 overflow-hidden px-4 h-12 border-s rounded-tl-lg">
-                  Name
+                  {t('name')}
                 </TableHead>
                 <TableHead className="bg-neutral-100 dark:bg-slate-700 border-t border-neutral-200 dark:border-slate-600 overflow-hidden px-4 h-12">
-                  Email
+                  {t('email')}
                 </TableHead>
                 <TableHead className="bg-neutral-100 dark:bg-slate-700 border-t border-neutral-200 dark:border-slate-600 overflow-hidden px-4 h-12">
-                  Position
+                  {t('position')}
                 </TableHead>
                 <TableHead className="bg-neutral-100 dark:bg-slate-700 border-t border-neutral-200 dark:border-slate-600 overflow-hidden px-4 h-12">
-                  Level
+                  {t('level')}
                 </TableHead>
                 <TableHead className="bg-neutral-100 dark:bg-slate-700 border-t border-neutral-200 dark:border-slate-600 overflow-hidden px-4 h-12 border-e rounded-tr-lg text-center">
-                  Status
+                  {t('status')}
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -153,7 +181,7 @@ export default async function TeamPage() {
                               : "bg-orange-500/10 text-orange-500"
                           }`}
                         >
-                          {member.position?.toUpperCase()}
+                          {member.position === "left" ? t('left').toUpperCase() : t('right').toUpperCase()}
                         </span>
                       </TableCell>
                       <TableCell
@@ -161,7 +189,7 @@ export default async function TeamPage() {
                           isLastRow ? "" : ""
                         }`}
                       >
-                        Level {member.depth}
+                        {t('level')} {member.depth}
                       </TableCell>
                       <TableCell
                         className={`py-3 px-4 border-b border-neutral-200 dark:border-slate-600 first:border-s last:border-e ${
@@ -175,7 +203,7 @@ export default async function TeamPage() {
                               : "bg-gray-500/10 text-gray-500"
                           }`}
                         >
-                          {member.status}
+                          {member.status === "active" ? t('active') : member.status}
                         </span>
                       </TableCell>
                     </TableRow>
@@ -184,7 +212,7 @@ export default async function TeamPage() {
               ) : (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                    No team members yet. Start building your network!
+                    {t('noTeamMembers')}
                   </TableCell>
                 </TableRow>
               )}

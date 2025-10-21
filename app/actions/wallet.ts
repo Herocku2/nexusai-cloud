@@ -15,15 +15,20 @@ export async function requestWithdrawal(formData: FormData) {
     throw new Error('Not authenticated')
   }
 
-  // Obtener el perfil del usuario para verificar el balance
+  // Obtener el perfil del usuario para verificar el balance y membresía activa
   const { data: profile } = await supabase
     .from('user_profiles')
-    .select('balance')
+    .select('balance, is_active')
     .eq('id', user.id)
     .single()
 
   if (!profile) {
     throw new Error('Profile not found')
+  }
+
+  // VALIDACIÓN CRÍTICA: Usuario debe tener membresía activa para retirar
+  if (!profile.is_active) {
+    throw new Error('No puedes retirar fondos porque tu membresía está inactiva. Debes renovar tu membresía mensual de $29 USD para continuar operando.')
   }
 
   const amount = parseFloat(formData.get('amount') as string)

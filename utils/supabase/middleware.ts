@@ -62,11 +62,22 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Si hay usuario y está intentando acceder a rutas de auth, redirigir al dashboard
-  if (user && request.nextUrl.pathname.startsWith('/auth') && request.nextUrl.pathname !== '/auth/confirm') {
-    const url = request.nextUrl.clone()
-    url.pathname = '/dashboard'
-    return NextResponse.redirect(url)
+  // CORRECCIÓN: No redirigir usuarios autenticados que están en /auth/login o /auth/callback
+  // Permitir que las server actions completen sus propios redirects
+  // Solo redirigir si están intentando acceder a otras rutas de auth (register, forgot-password, etc.)
+  if (user && request.nextUrl.pathname.startsWith('/auth')) {
+    // Excluir /auth/login, /auth/callback y /auth/confirm del auto-redirect
+    const allowedAuthRoutes = ['/auth/login', '/auth/callback', '/auth/confirm']
+    const isAllowedAuthRoute = allowedAuthRoutes.some(route => 
+      request.nextUrl.pathname === route
+    )
+    
+    if (!isAllowedAuthRoute) {
+      // Solo redirigir si está en otras rutas de auth como /auth/register o /auth/forgot-password
+      const url = request.nextUrl.clone()
+      url.pathname = '/dashboard'
+      return NextResponse.redirect(url)
+    }
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're

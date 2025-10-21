@@ -3,6 +3,7 @@ import { createClient } from "@/utils/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, Zap, Users2, TrendingUp } from "lucide-react";
 import { getCommissionsByType, getCommissionHistory } from "@/app/actions/wallet";
+import { getTranslations } from "@/lib/translations";
 import {
   Table,
   TableBody,
@@ -15,6 +16,7 @@ import {
 export default async function CommissionsPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  const t = await getTranslations('commissions_page');
   
   if (!user) {
     redirect("/auth/login");
@@ -26,7 +28,7 @@ export default async function CommissionsPage() {
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Commissions & Earnings</h1>
+        <h1 className="text-3xl font-bold">{t('title')}</h1>
       </div>
 
       {/* Commission Type Cards */}
@@ -35,12 +37,12 @@ export default async function CommissionsPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Fast Start Bonus</p>
+                <p className="text-sm text-muted-foreground">{t('fastStartBonus')}</p>
                 <h3 className="text-2xl font-bold mt-2">
                   ${commissionsByType?.fast_start?.toFixed(2) || "0.00"}
                 </h3>
                 <p className="text-xs text-muted-foreground mt-1">
-                  40% L1 + 8% L2
+                  {t('l1l2')}
                 </p>
               </div>
               <div className="h-12 w-12 rounded-full bg-green-500/10 flex items-center justify-center">
@@ -54,12 +56,12 @@ export default async function CommissionsPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Binary Bonus</p>
+                <p className="text-sm text-muted-foreground">{t('binaryBonus')}</p>
                 <h3 className="text-2xl font-bold mt-2">
                   ${commissionsByType?.binary?.toFixed(2) || "0.00"}
                 </h3>
                 <p className="text-xs text-muted-foreground mt-1">
-                  50% of weaker leg
+                  {t('weakerLeg')}
                 </p>
               </div>
               <div className="h-12 w-12 rounded-full bg-blue-500/10 flex items-center justify-center">
@@ -73,12 +75,12 @@ export default async function CommissionsPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Matching Bonus</p>
+                <p className="text-sm text-muted-foreground">{t('matchingBonus')}</p>
                 <h3 className="text-2xl font-bold mt-2">
                   ${commissionsByType?.matching?.toFixed(2) || "0.00"}
                 </h3>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Up to 20% depth
+                  {t('upToDepth')}
                 </p>
               </div>
               <div className="h-12 w-12 rounded-full bg-purple-500/10 flex items-center justify-center">
@@ -92,7 +94,7 @@ export default async function CommissionsPage() {
       {/* Compensation Plan Info */}
       <Card className="card">
         <CardHeader>
-          <CardTitle>Nexus AI Compensation Plan</CardTitle>
+          <CardTitle>{t('compensationPlan')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-3">
@@ -100,12 +102,12 @@ export default async function CommissionsPage() {
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <Zap className="h-5 w-5 text-green-500" />
-                <h4 className="font-semibold">Fast Start Bonus</h4>
+                <h4 className="font-semibold">{t('fastStartTitle')}</h4>
               </div>
               <ul className="text-sm space-y-1 text-muted-foreground">
-                <li>• Level 1: 40% ($40 per sale)</li>
-                <li>• Level 2: 8% ($8 per sale)</li>
-                <li>• Instant payment on direct referrals</li>
+                <li>{t('fastStartL1')}</li>
+                <li>{t('fastStartL2')}</li>
+                <li>{t('fastStartInstant')}</li>
               </ul>
             </div>
 
@@ -113,12 +115,12 @@ export default async function CommissionsPage() {
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-blue-500" />
-                <h4 className="font-semibold">Binary Bonus</h4>
+                <h4 className="font-semibold">{t('binaryTitle')}</h4>
               </div>
               <ul className="text-sm space-y-1 text-muted-foreground">
-                <li>• 50% of weaker leg volume</li>
-                <li>• Unlimited depth</li>
-                <li>• Weekly payout cycles</li>
+                <li>{t('binaryWeaker')}</li>
+                <li>{t('binaryUnlimited')}</li>
+                <li>{t('binaryWeekly')}</li>
               </ul>
             </div>
 
@@ -126,12 +128,12 @@ export default async function CommissionsPage() {
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <Users2 className="h-5 w-5 text-purple-500" />
-                <h4 className="font-semibold">Matching Bonus</h4>
+                <h4 className="font-semibold">{t('matchingTitle')}</h4>
               </div>
               <ul className="text-sm space-y-1 text-muted-foreground">
-                <li>• Match binary earnings of your team</li>
-                <li>• Rank-based percentage (5-20%)</li>
-                <li>• Up to 20 levels deep</li>
+                <li>{t('matchingTeam')}</li>
+                <li>{t('matchingRank')}</li>
+                <li>{t('matchingLevels')}</li>
               </ul>
             </div>
           </div>
@@ -141,26 +143,26 @@ export default async function CommissionsPage() {
       {/* Commission History Table */}
       <Card className="card">
         <CardHeader>
-          <CardTitle>Commission History</CardTitle>
+          <CardTitle>{t('commissionHistory')}</CardTitle>
         </CardHeader>
         <CardContent>
           <Table className="table-auto border-spacing-0 border-separate">
             <TableHeader>
               <TableRow className="border-0">
                 <TableHead className="bg-neutral-100 dark:bg-slate-700 border-t border-neutral-200 dark:border-slate-600 overflow-hidden px-4 h-12 border-s rounded-tl-lg">
-                  Date
+                  {t('date')}
                 </TableHead>
                 <TableHead className="bg-neutral-100 dark:bg-slate-700 border-t border-neutral-200 dark:border-slate-600 overflow-hidden px-4 h-12">
-                  Type
+                  {t('type')}
                 </TableHead>
                 <TableHead className="bg-neutral-100 dark:bg-slate-700 border-t border-neutral-200 dark:border-slate-600 overflow-hidden px-4 h-12">
-                  Description
+                  {t('description')}
                 </TableHead>
                 <TableHead className="bg-neutral-100 dark:bg-slate-700 border-t border-neutral-200 dark:border-slate-600 overflow-hidden px-4 h-12">
-                  Amount
+                  {t('amount')}
                 </TableHead>
                 <TableHead className="bg-neutral-100 dark:bg-slate-700 border-t border-neutral-200 dark:border-slate-600 overflow-hidden px-4 h-12 border-e rounded-tr-lg text-center">
-                  Status
+                  {t('status')}
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -204,7 +206,7 @@ export default async function CommissionsPage() {
                           isLastRow ? "" : ""
                         }`}
                       >
-                        {commission.description || 'Commission earned'}
+                        {commission.description || t('commissionEarned')}
                       </TableCell>
                       <TableCell
                         className={`py-3 px-4 border-b border-neutral-200 dark:border-slate-600 first:border-s last:border-e ${
@@ -227,7 +229,7 @@ export default async function CommissionsPage() {
                               : "bg-yellow-500/10 text-yellow-500"
                           }`}
                         >
-                          {commission.status}
+                          {commission.status === "paid" ? t('paid') : t('pending')}
                         </span>
                       </TableCell>
                     </TableRow>
@@ -236,7 +238,7 @@ export default async function CommissionsPage() {
               ) : (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                    No commission history yet. Start referring to earn!
+                    {t('noCommissions')}
                   </TableCell>
                 </TableRow>
               )}

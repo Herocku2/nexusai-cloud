@@ -1,7 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { ArrowLeft, Shield, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { loginAsUser } from "@/app/actions/admin";
@@ -23,8 +21,7 @@ export default async function LoginAsUserPage({ params }: { params: { id: string
 
   async function handleSubmit(formData: FormData) {
     'use server'
-    const masterPassword = formData.get('masterPassword') as string;
-    const result = await loginAsUser(params.id, masterPassword);
+    const result = await loginAsUser(params.id);
     
     if (result.success && result.redirectUrl) {
       redirect(result.redirectUrl);
@@ -53,16 +50,16 @@ export default async function LoginAsUserPage({ params }: { params: { id: string
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="mb-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
+          <div className="mb-4 p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
             <div className="flex items-start gap-3">
-              <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm text-red-800 dark:text-red-200 font-semibold">
+                <p className="text-sm text-amber-800 dark:text-amber-200 font-semibold">
                   Security Warning
                 </p>
-                <p className="text-xs text-red-700 dark:text-red-300 mt-1">
+                <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
                   This action will allow you to access the user's account as if you were them. 
-                  All actions performed will be logged. Requires master password for authorization.
+                  All actions performed will be logged. Only admins can perform this action.
                 </p>
               </div>
             </div>
@@ -76,20 +73,6 @@ export default async function LoginAsUserPage({ params }: { params: { id: string
                 <p className="text-sm"><strong>Status:</strong> {user.status}</p>
                 <p className="text-sm"><strong>Balance:</strong> ${Number(user.balance).toFixed(2)}</p>
               </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="masterPassword">Master Password *</Label>
-              <Input
-                id="masterPassword"
-                name="masterPassword"
-                type="password"
-                placeholder="Enter master admin password"
-                required
-              />
-              <p className="text-xs text-muted-foreground">
-                Enter the master admin password to proceed
-              </p>
             </div>
 
             <div className="flex gap-3">

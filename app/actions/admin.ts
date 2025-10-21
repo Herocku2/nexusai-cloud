@@ -5,65 +5,100 @@ import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { redirect } from 'next/navigation'
 
-// Credenciales de admin (en producción deberían estar en variables de entorno)
+// Email del admin - debe existir en Supabase Auth
 const ADMIN_EMAIL = 'admin@nexusai.com'
-const ADMIN_PASSWORD = 'NexusAdmin2024!SecurePass'
-const MASTER_PASSWORD = 'NexusMaster2024!SuperSecure'
 
 export async function adminLogin(formData: FormData) {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
   const supabase = await createClient()
 
-  // Autenticar con Supabase
-  const { data: authData, error } = await supabase.auth.signInWithPassword({
+  // Autenticar con Supabase Auth (SIN hardcodear contraseñas)
+  const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
     email,
     password,
   })
 
-  if (error || !authData.user) {
-    return { error: 'Invalid admin credentials' }
+  if (authError) {
+    console.error('Admin login error:', authError.message)
+    return { error: authError.message || 'Invalid credentials' }
   }
 
-  // Verificar que el usuario tenga rol de admin
-  const { data: profile } = await supabase
+  if (!authData.user) {
+    return { error: 'Authentication failed' }
+  }
+
+  // Verificar que tenga el flag is_admin en su perfil
+  const { data: profile, error: profileError } = await supabase
     .from('user_profiles')
-    .select('id, status')
+    .select('is_admin')
     .eq('id', authData.user.id)
     .single()
 
-  // Verificar si el email es el email de admin
-  if (email !== ADMIN_EMAIL) {
+  if (profileError || !profile || !profile.is_admin) {
+    console.error('Admin profile error:', profileError?.message || 'No admin flag')
     await supabase.auth.signOut()
-    return { error: 'Unauthorized access' }
+    return { error: 'Unauthorized: Admin access required' }
   }
 
-  return { success: true }
+  // Revalidar y hacer redirect desde aquí
+  revalidatePath('/', 'layout')
+  redirect('/admin/dashboard')
 }
 
-export async function loginAsUser(userId: string, masterPassword: string) {
-  if (masterPassword !== MASTER_PASSWORD) {
-    return { error: 'Invalid master password' }
+export async function loginAsUser(userId: string) {
+  // Validar que quien hace la petición es admin
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  
+  if (!user) {
+    return { error: 'Not authenticated' }
   }
 
-  const supabase = createAdminClient()
-  
-  // Obtener datos del usuario
-  const { data: user, error } = await (supabase
+  // Verificar que el usuario actual es admin
+  const { data: adminProfile } = await supabase
+    .from('user_profiles')
+    .select('is_admin')
+    .eq('id', user.id)
+    .single()
+
+  if (!adminProfile || !adminProfile.is_admin) {
+    return { error: 'Unauthorized: Admin access required' }
+  }
+
+  // Obtener datos del usuario objetivo usando admin client
+  const adminClient = createAdminClient()
+  const { data: targetUser, error } = await (adminClient
     .from('user_profiles') as any)
     .select('*')
     .eq('id', userId)
     .single()
 
-  if (error || !user) {
+  if (error || !targetUser) {
     return { error: 'User not found' }
   }
 
-  // Aquí se crearía una sesión temporal del usuario
-  // En producción, esto se manejaría con tokens especiales
+  // Obtener email del usuario desde auth.users
+  const { data: authUser } = await adminClient.auth.admin.getUserById(userId)
+  
+  if (!authUser?.user?.email) {
+    return { error: 'User email not found' }
+  }
+
+  // Crear un token de sesión temporal para el usuario objetivo
+  const { data: sessionData, error: sessionError } = await adminClient.auth.admin.generateLink({
+    type: 'magiclink',
+    email: authUser.user.email,
+  })
+
+  if (sessionError || !sessionData) {
+    return { error: 'Failed to create session for user' }
+  }
+
   return { 
     success: true, 
-    redirectUrl: `/dashboard?admin_impersonate=${userId}`
+    redirectUrl: `/dashboard?admin_impersonate=${userId}`,
+    sessionUrl: sessionData.properties?.action_link
   }
 }
 

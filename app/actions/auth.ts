@@ -50,9 +50,17 @@ export async function login(formData: FormData) {
     
     if (insertError) {
       console.error('Insert profile error:', insertError)
+      return { error: 'Error creating user profile' }
     }
   }
 
+  // Verificar que el status sea 'active'
+  if (profile && profile.status !== 'active') {
+    console.error('User status is not active:', profile.status)
+    return { error: `Account is ${profile.status}. Please contact support.` }
+  }
+
+  // Revalidar y hacer redirect desde aquí
   revalidatePath('/', 'layout')
   redirect('/dashboard')
 }
